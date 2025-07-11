@@ -18,6 +18,15 @@ def organize_address_with_chatgpt(row):
     Returns dict with:
     street_number, street_name, apt, city, state, zip, ref, place_name, alternative_addresses[]
     """
+    nearby_zipcodes = []
+
+    # If city is Riverside, ensure 02915 and 02914 are included
+    if row.get('tx_town', '').strip().lower() == 'riverside':
+       for zip_candidate in ['02915', '02914']:
+           if zip_candidate not in nearby_zipcodes and zip_candidate != row.get('cd_zip', '').strip():
+              nearby_zipcodes.append(zip_candidate)
+
+
 
     prompt = f"""
 You are an advanced address parsing assistant. Given the following address fields from a spreadsheet row:
@@ -41,6 +50,18 @@ If the street number contains a decimal like '45.5', convert it to USPS-complian
 
 Additionally, provide an array of 5-7 nearby ZIP codes for the given city/state, even if the address includes a ZIP code. These will be used as alternative ZIP codes for address validation.
 
+"""
+
+    # Conditionally add your pre-added ZIP codes if they exist
+    if nearby_zipcodes:
+        prompt += f"""
+
+Here are some nearby ZIP codes that must be included if relevant:
+{', '.join(nearby_zipcodes)}.
+
+"""
+    # Continue with your prompt JSON return instructions
+    prompt += """    
 Return your response in **JSON format** with keys:
 - street_number
 - street_name

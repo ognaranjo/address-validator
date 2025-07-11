@@ -52,7 +52,7 @@ def validate_usps(address, city=None, state=None, zip5=None, apt=None):
 
     #token = get_usps_token()
 
-    token = "eyJraWQiOiJIdWpzX2F6UnFJUzBpSE5YNEZIRk96eUwwdjE4RXJMdjNyZDBoalpNUnJFIiwidHlwIjoiSldUIiwiYWxnIjoiUlMyNTYifQ.eyJlbnRpdGxlbWVudHMiOlt7Im5hbWUiOiJGQVNUIiwiY3JpZHMiOiI1MzEwODA5MiJ9XSwic3ViIjoiNDU5Mzk1Njk5IiwiY3JpZCI6IjUzMTA4MDkyIiwic3ViX2lkIjoiNDU5Mzk1Njk5Iiwicm9sZXMiOltdLCJwYXltZW50X2FjY291bnRzIjp7InBlcm1pdHMiOltdfSwiaXNzIjoiaHR0cHM6Ly9rZXljLnVzcHMuY29tL3JlYWxtcy9VU1BTIiwiY29udHJhY3RzIjp7InBheW1lbnRBY2NvdW50cyI6e30sInBlcm1pdHMiOltdfSwiYXVkIjpbInBheW1lbnRzIiwicHJpY2VzIiwic3Vic2NyaXB0aW9ucy10cmFja2luZyIsIm9yZ2FuaXphdGlvbnMiXSwiYXpwIjoiQURhRHZSUW4ySVJidjhRRTNtTkh0QXpCWmZza2dnNW5WeENNQ3RhaEFHU1pvTEFaIiwibWFpbF9vd25lcnMiOlt7ImNyaWQiOiI1MzEwODA5MiIsIm1pZHMiOiI5MDM5MzExOTcsIDkwMzkzMTE5OCwgOTAzOTMxMTk0LCA5MDM5MzExOTYifV0sInNjb3BlIjoiYWRkcmVzc2VzIiwiY29tcGFueV9uYW1lIjoiV2hvcGxheXMgVVMiLCJleHAiOjE3NTIwMDY5OTQsImlhdCI6MTc1MTk3ODE5NCwianRpIjoiNDYyNzNiZDUtMzNhMi00ODZkLTliMWQtNWRiZTNlY2IzMjFmIn0.Nl2yu7Cc9mEvJihbeQQWy3laLh5ETwJ3MohvLVZJ2i6pCPocWlNLYInp_1inZo06FaKu9TkFRNOv8oUa_10QvkpmUsmfr8zP6R3vYxaAsjfy5SIiJD1rINxT73_RRllaVN6cuHT5vz77uAFFf53EcksFIxsNVhsTXfYUNLtOSq6Ib7D20lYuFX_AlBPw3F7jMg8mgpS9cPvi-iIbvM5qF_Fk4_hnDhxgUNdgqkisPIklt8tzdkuTmIErVXMBwd30RvxoNHqSJjm0BppO2lmXou9zNL06fTTMHDsHtNwjLgM0F40vWOb162hf-GogKCWmM_8SocYToDcJiLcQ9aAJww"
+    token = "eyJraWQiOiJIdWpzX2F6UnFJUzBpSE5YNEZIRk96eUwwdjE4RXJMdjNyZDBoalpNUnJFIiwidHlwIjoiSldUIiwiYWxnIjoiUlMyNTYifQ.eyJlbnRpdGxlbWVudHMiOlt7Im5hbWUiOiJGQVNUIiwiY3JpZHMiOiI1MzEwODA5MiJ9XSwic3ViIjoiNDU5Mzk1Njk5IiwiY3JpZCI6IjUzMTA4MDkyIiwic3ViX2lkIjoiNDU5Mzk1Njk5Iiwicm9sZXMiOltdLCJwYXltZW50X2FjY291bnRzIjp7InBlcm1pdHMiOltdfSwiaXNzIjoiaHR0cHM6Ly9rZXljLnVzcHMuY29tL3JlYWxtcy9VU1BTIiwiY29udHJhY3RzIjp7InBheW1lbnRBY2NvdW50cyI6e30sInBlcm1pdHMiOltdfSwiYXVkIjpbInBheW1lbnRzIiwicHJpY2VzIiwic3Vic2NyaXB0aW9ucy10cmFja2luZyIsIm9yZ2FuaXphdGlvbnMiXSwiYXpwIjoiQURhRHZSUW4ySVJidjhRRTNtTkh0QXpCWmZza2dnNW5WeENNQ3RhaEFHU1pvTEFaIiwibWFpbF9vd25lcnMiOlt7ImNyaWQiOiI1MzEwODA5MiIsIm1pZHMiOiI5MDM5MzExOTcsIDkwMzkzMTE5OCwgOTAzOTMxMTk0LCA5MDM5MzExOTYifV0sInNjb3BlIjoiYWRkcmVzc2VzIiwiY29tcGFueV9uYW1lIjoiV2hvcGxheXMgVVMiLCJleHAiOjE3NTIxODU0NjcsImlhdCI6MTc1MjE1NjY2NywianRpIjoiYjgzZTNiMzItMDIzMS00NjdiLTk3MTAtNTU0M2U2Mzg4ZTIwIn0.OXK7vj3kO1KgSE8KXoU0-ZMtE4zzrwZIX33infTfValviVVlK0rFwdnlDG3CuqYaszJ6n3nzP_Slnm_MKy6xa10yStNKXqFOrU2VVbIIZN_y4a8jQ4ipNEJ3Y42HdHSdEjs9uHvY0OgVv5ufXcIisI-pRUKR1slk-8kzqjpg7mZWHCthKzU0azjXLrIMVWvUaBZplPIgHm-p0KWHeSemSunj1vuQA0_Tik1qaHai2kj8cQiKzSd1BkuSnnf9kWxS8OuGzVJJfdl2wSeUpflN8Qe4iDrcuDbbzXxjxCmUByWFslElE3_dlFIIJ6URF2p_Uz4sdtENd7mc8xDb9L9D-A"
 
     endpoint = f"{USPS_API_BASE_URL}/address"
 
@@ -84,23 +84,43 @@ def validate_usps(address, city=None, state=None, zip5=None, apt=None):
 
         corrected_address = f"{addr.get('streetAddress', '')}, {addr.get('city', '')}, {addr.get('state', '')} {addr.get('ZIPCode', '')}-{addr.get('ZIPPlus4', '')}"
 
-        return {
-            "valid": True,
-            "corrected_address": corrected_address,
-            "standardized_address": {
-            "street_number": street_number,
-            "street": street_name,
-            "city": addr.get('city', ''),
-            "state": addr.get('state', ''),
-            "zip5": addr.get('ZIPCode', ''),
-            "zip4": addr.get('ZIPPlus4', ''),
-            "apt": addr.get('secondaryAddress', ''),
+        suggested_address = f"{street_number} {street_name}, {addr.get('city', '')}, {addr.get('state', '')} {addr.get('ZIPCode', '')}-{addr.get('ZIPPlus4', '')}"
+
+        # Display options to user
+        print("\n")
+        print(f"Suggested address: {suggested_address}")
+        print("\n")
+        decision = input("Choose action: (A)ccept / (S)kip: ").strip().lower()
+
+        if decision == 'a':
+
+            return {
+                "valid": True,
+                "corrected_address": corrected_address,
+                "standardized_address": {
+                "street_number": street_number,
+                "street": street_name,
+                "city": addr.get('city', ''),
+                "state": addr.get('state', ''),
+                "zip5": addr.get('ZIPCode', ''),
+                "zip4": addr.get('ZIPPlus4', ''),
+                "apt": addr.get('secondaryAddress', ''),
+                }
             }
-        }
+            
+        else:
+            print("Address skipped by the user.")
+
+            return {
+                "valid": False,
+                "corrected_address": None,
+                "error": "reviewed and skipped by user"
+            }        
+
 
     else:
         # Log error details
-        print("USPS REST API error:", response.status_code, response.text)
+        # print("USPS REST API error:", response.status_code, response.text)
         return {
             "valid": False,
             "corrected_address": None,

@@ -21,59 +21,102 @@ df = pd.read_excel(INPUT_FILE)
 df.columns = df.columns.str.strip().str.replace(' ', '_').str.lower()
 
 # Reset index to track Excel row number
-df.reset_index(inplace=True)
-df.rename(columns={'index': 'pandas_index'}, inplace=True)
-df['original_excel_row_number'] = df['pandas_index'] + 2
+# df.reset_index(inplace=True)
+# df.rename(columns={'index': 'pandas_index'}, inplace=True)
+# df['original_excel_row_number'] = df['pandas_index'] + 2
 
 # Add result columns
-df['new_town'] = ''
-df['new_state'] = ''
-df['new_zip'] = ''
-df['new_addr_nbr'] = ''
-df['new_address'] = ''
-df['new_apt'] = ''
-df['addr_ref'] = ''
-df['status'] = ''
-df['notes'] = ''
+# df['new_town'] = ''
+# df['new_state'] = ''
+# df['new_zip'] = ''
+# df['new_addr_nbr'] = ''
+# df['new_address'] = ''
+# df['new_apt'] = ''
+# df['addr_ref'] = ''
+# df['status'] = ''
+# df['notes'] = ''
+
+# List of your target columns (converted to lowercase)
+columns_to_print = [
+    'tx_town',
+    'cd_state',
+    'cd_zip',
+    'curr_adr',
+    'grp_cnt',
+    'ad_strt_nbr',
+    'ad_strt_nme',
+    'ad_line2',
+    'ad_line3',
+    'apt'
+]
+
+columns_to_convert = ['notes', 'new_zip', 'new_addr_nbr', 'status']
+for col in columns_to_convert:
+    if col in df.columns:
+        df[col] = df[col].astype(str)
+
 
 # ===== PROCESS ROWS =====
 for index, row in df.iterrows():
     error = row.get('error', None)
+    status = row.get('status', '')
 
     # Skip if Error is blank or null
     if pd.isna(error) or str(error).strip() == '':
         continue
 
+    # Skip if Status is not blank or null 
+    if pd.notna(status) and str(status).strip() != '':
+        continue
+    
     # Skip if all address fields are blank
     if all(pd.isna(row.get(col, '')) or str(row.get(col, '')).strip() == '' for col in ['ad_strt_nbr', 'ad_strt_nme', 'ad_line2', 'ad_line3']):
-       df.loc[index, 'status'] = 'All address fields blank'
-    
+       df.loc[index, 'notes'] = 'All address fields blank'
+       df.loc[index, 'status'] = 'NotFound'
+       
+       # error_col_letter = 'R'  # Replace with actual column letter for Error
+
+       # df[f'{error_col_letter}{index}'].fill = PatternFill(start_color='FFFF00', end_color='FFFF00', fill_type='solid')
+
+       # Save after each decision to prevent data loss
+       df.to_excel(INPUT_FILE, index=False)
 
        # Save your dataframe first if it does not exist
-       if not os.path.exists(OUTPUT_FILE):
-           df.to_excel(OUTPUT_FILE, index=False)
+       #if not os.path.exists(OUTPUT_FILE):
+       #    df.to_excel(OUTPUT_FILE, index=False)
 
        # Highlight Error column in yellow (if saving via openpyxl later)
        # You will need to apply formatting after saving with pandas:
        # Save first, then reopen with openpyxl:
-       wb = openpyxl.load_workbook(OUTPUT_FILE)
-       ws = wb.active
-       excel_row = index + 2  # Adjust for header
-       error_col_letter = 'R'  # Replace with actual column letter for Error
+       # wb = openpyxl.load_workbook(OUTPUT_FILE)
+       # ws = wb.active
+       # excel_row = index + 2  # Adjust for header
+       
+       # ws[f'{error_col_letter}{excel_row}'].fill = PatternFill(start_color='FFFF00', end_color='FFFF00', fill_type='solid')
 
-       ws[f'{error_col_letter}{excel_row}'].fill = PatternFill(start_color='FFFF00', end_color='FFFF00', fill_type='solid')
-
-       wb.save(OUTPUT_FILE)
-       wb.close()
+       # wb.save(OUTPUT_FILE)
+       # wb.close()
     
        continue
+
 
     # STEP 1. Organize address with ChatGPT
     organized = organize_address_with_chatgpt(row)
     if not organized:
         df.loc[index, 'status'] = 'NoMatch'
         df.loc[index, 'notes'] = 'ChatGPT unable to parse address'
+        # Save after each decision to prevent data loss
+        df.to_excel(INPUT_FILE, index=False)
         continue
+
+
+    print("************ ROW START ************")
+    print(f"Processing row {index + 2}")
+    
+    for col in columns_to_print:
+        value = row.get(col, '')
+        print(f"{col.upper()}: {value}")    
+
 
     google_validation_queue = []    
 
@@ -101,7 +144,7 @@ for index, row in df.iterrows():
             alt_zipcode_full = alt_zipcode.strip()
             alt_usps_result = validate_usps(
                 full_street_address, 
-                organized['city'], 
+                '',  # no city, 
                 organized['state'], 
                 alt_zipcode_full,
                 organized.get('apt', '')
@@ -109,7 +152,7 @@ for index, row in df.iterrows():
             if alt_usps_result['valid']:
                 usps_result = alt_usps_result
                 # You may optionally note that this is an alternative address match
-                df.loc[index, 'notes'] += f" Used alternative zipcode: {alt_zipcode_full}"
+                df.loc[index, 'notes'] = f"Used alternative zipcode: {alt_zipcode_full}"
                 break  # Stop after first valid alternative
             else:
                 # If USPS validation succeeded, no need to queue for Google validation
@@ -132,7 +175,7 @@ for index, row in df.iterrows():
                 )
                 if alt_usps_result['valid']:
                     usps_result = alt_usps_result
-                    df.loc[index, 'notes'] += f" Used alternative address with current zip: {organized['zip']}"
+                    df.loc[index, 'notes'] = f" Used alternative address with current zip: {organized['zip']}"
                     break  # Stop after first valid alternative
                 else:
                     # If USPS validation succeeded, no need to queue for Google validation
@@ -153,7 +196,7 @@ for index, row in df.iterrows():
                     )
                     if alt_usps_result['valid']:
                         usps_result = alt_usps_result
-                        df.loc[index, 'notes'] += f" Used alternative address with nearby zip: {alt_zipcode_full}"
+                        df.loc[index, 'notes'] = f" Used alternative address with nearby zip: {alt_zipcode_full}"
                         break  # Stop after first valid alternative
                     else:
                         # If USPS validation succeeded, no need to queue for Google validation
@@ -176,9 +219,11 @@ for index, row in df.iterrows():
         df.loc[index, 'new_apt'] = usps_result['standardized_address'].get('apt', organized['apt']) 
         df.loc[index, 'addr_ref'] = organized['ref']
         df.loc[index, 'status'] = 'Valid'
+        # Save after each decision to prevent data loss
+        df.to_excel(INPUT_FILE, index=False)
     else:
 
-        for index, address in google_validation_queue:
+        for address in google_validation_queue:
             google_result = validate_google_address(address)
             if google_result['valid']:
                 usps_result = google_result
@@ -201,6 +246,7 @@ for index, row in df.iterrows():
         else:
             df.loc[index, 'status'] = 'NoMatch'
             df.loc[index, 'notes'] = 'Invalid address and not a place name'
+    print("************* ROW END *************\n")
 
 # ===== OUTPUT RESULTS =====
 if SAVE_AS_NEW_FILE:
