@@ -1,3 +1,4 @@
+import pandas as pd
 from openai import AzureOpenAI
 
 client = AzureOpenAI(
@@ -20,10 +21,16 @@ def organize_address_with_chatgpt(row):
     """
     nearby_zipcodes = []
 
+    zip_value = row.get('cd_zip', '')
+    if pd.isna(zip_value):
+        zip_value = ''
+    zip_value = str(zip_value).strip()
+    
+
     # If city is Riverside, ensure 02915 and 02914 are included
     if row.get('tx_town', '').strip().lower() == 'riverside':
        for zip_candidate in ['02915', '02914']:
-           if zip_candidate not in nearby_zipcodes and zip_candidate != row.get('cd_zip', '').strip():
+           if zip_candidate not in nearby_zipcodes and zip_candidate != zip_value:
               nearby_zipcodes.append(zip_candidate)
 
 
@@ -48,7 +55,7 @@ Perform the following:
 
 If the street number contains a decimal like '45.5', convert it to USPS-compliant fraction format (e.g. '45 1/2').
 
-Additionally, provide an array of 5-7 nearby ZIP codes for the given city/state, even if the address includes a ZIP code. These will be used as alternative ZIP codes for address validation.
+Additionally, provide an array of 2-3 nearby ZIP codes for the given city/state, even if the address includes a ZIP code. These will be used as alternative ZIP codes for address validation.
 
 """
 
@@ -72,7 +79,7 @@ Return your response in **JSON format** with keys:
 - ref (1=AD_STRT_NME, 2=AD_Line2, 3=AD_Line3, 4=Apt)
 - place_name (if any, else 'N/A')
 - alternative_addresses (array of alternative address strings, can be empty [])
-- nearby_zipcodes (array of 5-7 possible ZIP codes for the zipcode/city/state)
+- nearby_zipcodes (array of 2-3 possible ZIP codes for the zipcode/city/state)
 
 If all fields are blank, return null.
 
@@ -103,6 +110,13 @@ Example output:
     import json
     try:
         result = json.loads(response.choices[0].message.content)
+        street_number = result.get("street_number", "")
+        if not street_number or not str(street_number).strip().isdigit():
+            result["street_number"] = ""
+            result["street_name"] = ""
+            result["alternative_addresses"] = []
+            result["nearby_zipcodes"] = []
+
         return result
     except Exception as e:
         print("Error parsing ChatGPT response:", e)

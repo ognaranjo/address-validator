@@ -1,5 +1,6 @@
 addresses.xlsx
 processed_addresses.xlsx
+processed_addresses.csv
 *.pyc
 __pycache__/
 .env
